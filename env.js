@@ -2,6 +2,7 @@ var GitHubApi = require('github');
 var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
 var path = require('path');
+var _ = require('underscore');
 
 var github = new GitHubApi();
 
@@ -40,8 +41,8 @@ function packageDependencies(pkgName, pkgs) {
   var pkgNames = new Set(Object.keys(pkgs));
 
   return Object.keys(pkg.dependencies || {})
-    .concat(Object.keys(pkg.devDependencies || {}))
-    .filter(function (dep) { return pkgNames.has(dep) });
+  .concat(Object.keys(pkg.devDependencies || {}))
+  .filter(function (dep) { return pkgNames.has(dep) });
 }
 
 function when(func) {
@@ -56,9 +57,9 @@ function when(func) {
 }
 
 function traverse(handlers, pkgName, pkgs, prior, depth) {
-	if (handlers instanceof Function) {
-		handlers = {leave: handlers};
-	}
+  if (handlers instanceof Function) {
+    handlers = {leave: handlers};
+  }
   prior = prior || new Set();
   depth = depth || 0;
 
@@ -68,8 +69,8 @@ function traverse(handlers, pkgName, pkgs, prior, depth) {
 
   var deps = packageDependencies(pkgName, pkgs);
 
-	return when(handlers.enter, pkgName, pkgs, depth).then(function (enterResult) {
-		var promises = deps.map(function (dep) {
+  return when(handlers.enter, pkgName, pkgs, depth).then(function (enterResult) {
+    var promises = deps.map(function (dep) {
       var hadDepAlready = prior.has(dep);
 
       var newPrior = new Set([...prior, pkgName, ...deps]);
@@ -77,18 +78,18 @@ function traverse(handlers, pkgName, pkgs, prior, depth) {
         newPrior.delete(dep);
       }
 
-			return traverse(handlers, dep, pkgs, newPrior, depth+1);
-		});
+      return traverse(handlers, dep, pkgs, newPrior, depth+1);
+    });
 
-		return Promise.all(promises);
-	}).then(function (traverseResults) {
+    return Promise.all(promises);
+  }).then(function (traverseResults) {
     var pkgTraversals = {};
     for (var i = 0; i < deps.length; i++) {
       pkgTraversals[deps[i]] = traverseResults[i];
     }
 
-		return when(handlers.leave, pkgName, pkgs, depth, pkgTraversals)
-	});
+    return when(handlers.leave, pkgName, pkgs, depth, pkgTraversals)
+  });
 }
 
 function testTraverse(pkgName, pkgs) {
@@ -147,21 +148,21 @@ function initEnv() {
   //     return;
   //   }
 
-    console.log("Identifying npm packages");
-    console.log("========================");
-    console.log();
+  console.log("Identifying npm packages");
+  console.log("========================");
+  console.log();
 
-    var pkgs = availablePackages(home);
-    pkglog = indent(console.log, 1);
-    Object.keys(pkgs).forEach(function (pkgName) {
-      pkglog(`- ${pkgName}`);
-    });
+  var pkgs = availablePackages(home);
+  pkglog = indent(console.log, 1);
+  Object.keys(pkgs).forEach(function (pkgName) {
+    pkglog(`- ${pkgName}`);
+  });
 
-    console.log(dependencyDOT(pkgs));
+  console.log(dependencyDOT(pkgs));
 
-    // console.log("Performing Linking");
-    // console.log("==================");
-    // linkTree("truffle", pkgs, new Set(), 0);
+  // console.log("Performing Linking");
+  // console.log("==================");
+  // linkTree("truffle", pkgs, new Set(), 0);
   // });
 }
 
@@ -229,7 +230,7 @@ module.exports = {
     Object.keys(pkgs).forEach(function (pkgName) {
       var pkgNode = pkgNodes[pkgName];
       var dependentNodes = packageDependencies(pkgName, pkgs)
-        .map(function (dep) { return pkgNodes[dep]; });
+      .map(function (dep) { return pkgNodes[dep]; });
 
       if (dependentNodes.length) {
         dotSource += `${pkgNode} -> { ${dependentNodes.join(' ')} };`;
