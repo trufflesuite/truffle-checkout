@@ -2,7 +2,6 @@ var GitHubApi = require('github');
 var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
 var path = require('path');
-var _ = require('underscore');
 
 var github = new GitHubApi();
 
