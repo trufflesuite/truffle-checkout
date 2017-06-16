@@ -22,7 +22,7 @@ var organization = "trufflesuite";
 var prepared = {};
 var packages = argv._;
 
-var baseBranch = "master";
+var baseBranch = "*";
 
 if (packages.length == 0) {
   packages = ["truffle:" + baseBranch];
