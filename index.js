@@ -1,43 +1,120 @@
 #!/usr/bin/env node
-var env = require("./env");
+var fs = require("fs");
+var path = require("path");
+var indent = require("./lib/indent");
+var prepare = require("./lib/prepare");
+var dependencies = require("./lib/dependencies");
+var link = require("./lib/link");
+var list = require("./lib/list");
+var github = require("./lib/github");
 
-var tests = [];
+var argv = require('yargs').argv
 
-var ignore = new Set([
-  'ganache-core',
-  'merkle-patricia-tree'
-]);
+var working_directory = process.cwd();
 
-function pkgTests(pkgName, srcpath) {
-  var pkgs = env.availablePackages(srcpath);
+if (argv.l) {
+  list(working_directory);
+  process.exit();
+}
 
-  var handlers = {
-    enter: function(pkgName, pkgs, depth) {
-    },
+var organization = "trufflesuite";
 
-    leave: function(pkgName, pkgs, depth) {
-      var pkg = pkgs[pkgName];
-      var cwd = pkg._path;
+var prepared = {};
+var packages = argv._;
 
-      if (!ignore.has(pkgName) && pkg.scripts.test) {
-        tests.push(cwd);
-      }
+var baseBranch = "*";
+
+if (packages.length == 0) {
+  packages = ["truffle:" + baseBranch];
+}
+
+// For any package that doesn't specify a branch selector, specify it.
+packages = packages.map(function(package) {
+  if (package.indexOf("@") < 0 && package.indexOf(":") < 0) {
+    package = package + ":" + baseBranch;
+  }
+  return package;
+});
+
+var branchOverrides = {};
+
+// Record all 1-off branch overrides ("@" selector)
+packages.forEach(function(package) {
+  if (package.indexOf("@") >= 0) {
+    var pieces = package.split("@")
+    branchOverrides[pieces[0]] = pieces[1];
+  }
+});
+
+packages = packages.reverse();
+
+console.log("Getting package list from Github...");
+console.log("");
+
+github.repositories(organization).then(function(response) {
+  var repositories = response.data.map(function(repo) {
+    return repo.name;
+  });
+
+  while (packages.length > 0) {
+    var currentPackage = packages.shift();
+
+    var match = currentPackage.match(/(.*)(@|:)(.*)/);
+
+    var currentPackageName = match[1];
+    var selector = match[2];
+    var packageBranch = branchOverrides[currentPackageName] || match[3];
+    var dependencyBranch = baseBranch;
+
+    if (selector == ":") {
+      dependencyBranch = packageBranch;
     }
+
+    // Just in case.
+    if (prepared[currentPackageName] != null) {
+      continue;
+    }
+
+    // Not installed yet? Let's do it.
+    var checkoutLocation = prepare({
+      packageName: currentPackageName,
+      branch: packageBranch,
+      organization: organization,
+      baseDirectory: working_directory,
+      fetch: !!argv.fetch
+    });
+
+    var dependedPackages = dependencies.installed(checkoutLocation);
+
+    // For all packages that are depended on that are also part the organization,
+    // that haven't already been prepared, prepare them too.
+    repositories.forEach(function(packageName) {
+      if (dependedPackages[packageName] != null && prepared[packageName] == null) {
+        packages.push(packageName + selector + dependencyBranch);
+      }
+    });
+
+    // Mark as prepared
+    prepared[currentPackageName] = packageBranch;
   }
 
-  return env.traverse(handlers, pkgName, pkgs);
-}
+  var logger = indent(console, 2);
 
+  logger.log("Linking packages...");
 
-var pkgName;
-if (process.argv.length > 2) {
-  pkgName = process.argv[2];
-} else {
-  pkgName = "truffle";
-}
+  // Linking step happens after everything has been prepared
+  link(working_directory);
 
-var home = process.env.TRUFFLEHOME;
+  console.log("");
+  console.log("Status:");
+  console.log("");
 
-return pkgTests(pkgName, home).then(function() {
-  console.log(tests.join(' '));
+  list(working_directory);
+  console.log("")
+}).catch(function(e) {
+  throw e;
+});
+
+process.on('unhandledRejection', function(error) {
+  console.log(error);
 });
