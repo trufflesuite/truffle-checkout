@@ -17,6 +17,11 @@ if (argv.l) {
   process.exit();
 }
 
+if (argv.L) {
+  link(working_directory);
+  process.exit();
+}
+
 var organization = "trufflesuite";
 
 var prepared = {};
