@@ -1,12 +1,14 @@
 var fs = require("fs");
-var status = require("./status");
-var indent = require("./indent");
 var path = require("path");
 
-module.exports = function(working_directory) {
-  var logger = indent(console, 2);
+var status = require("../lib/status");
+var indent = require("../lib/indent");
 
-  var statuses = status(working_directory);
+module.exports = function(options, logger) {
+  var logger = logger || indent(console, 0);
+  var inDir = options.inDir;
+
+  var statuses = status(inDir);
   var packageNames = statuses.map(function(item) {
     return item.package;
   });

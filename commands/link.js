@@ -1,17 +1,24 @@
 var fs = require("fs");
 var path = require("path");
 var rimraf = require("rimraf");
-var runSync = require("./runsync");
 
-module.exports = function(working_directory) {
-  var packages = fs.readdirSync(working_directory).filter(function(directory) {
+var indent = require("../lib/indent");
+var runSync = require("../lib/runsync");
+
+module.exports = function(options, logger) {
+  var logger = logger || indent(console, 0);
+  var inDir = options.inDir;
+
+  logger.log("Linking packages...")
+
+  var packages = fs.readdirSync(inDir).filter(function(directory) {
     return fs.statSync(directory).isDirectory();
   });
 
   var packagePaths = {};
 
   packages.forEach(function(packageName) {
-    packagePaths[packageName] = path.resolve(path.join(working_directory, packageName));
+    packagePaths[packageName] = path.resolve(path.join(inDir, packageName));
   });
 
   packages.forEach(function(packageName) {
@@ -29,7 +36,9 @@ module.exports = function(working_directory) {
       rimraf.sync(expected_dependency_installation_path);
 
       // Now link it back up.
-      runSync('ln', ["-s", packagePaths[potential_dependency], potential_dependency], expected_dependency_base_path, console, true)
+      runSync('ln', ["-s", packagePaths[potential_dependency], potential_dependency], expected_dependency_base_path, indent(logger, 2), true)
     });
   });
+
+  logger.log("Done.")
 };
