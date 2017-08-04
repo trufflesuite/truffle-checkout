@@ -15,7 +15,7 @@ var constants = require("../lib/constants");
  */
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
-  var inDir = options.inDir;
+  var workspace = options.workspace;
   var fetch = options.fetch;
 
   var packages = options.packages;
@@ -80,7 +80,7 @@ module.exports = function(options, logger) {
         packageName: currentPackageName,
         branch: packageBranch,
         organization: constants.defaultOrganization,
-        baseDirectory: inDir,
+        baseDirectory: workspace,
         fetch: fetch,
       });
 
@@ -99,10 +99,10 @@ module.exports = function(options, logger) {
     }
 
     // Linking step happens after everything has been prepared
-    link({ inDir: inDir }, indent(logger, 2));
+    link({ workspace: workspace }, indent(logger, 2));
 
     // Display status
-    list({ inDir: inDir }, indent(logger, 2));
+    list({ workspace: workspace }, indent(logger, 2));
     logger.log("")
   }).catch(function(e) {
     throw e;

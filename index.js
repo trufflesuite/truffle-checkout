@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+var process = require("process");
+
 var link = require("./commands/link");
 var list = require("./commands/list");
 var use = require("./commands/use");
@@ -8,19 +10,19 @@ require('yargs')
   .command('list', 'List managed packages',
     function() {},
     function(argv) {
-      list({ inDir: argv.dir });
+      list({ workspace: argv.dir });
       process.exit();
   })
   .command('link', 'Link managed packages',
     function() {},
     function(argv) {
-      link({ inDir: argv.dir });
+      link({ workspace: argv.dir });
       process.exit();
   })
   .command('init', 'Initialize truffle, pointing to trufflesuite/master',
     function() {},
     function(argv) {
-      use({ inDir: argv.dir, packages: [] });
+      use({ workspace: argv.dir, packages: [] });
     }
   )
   .command('workon <org> <branch>', 'Use a specific remote/branch environment',
@@ -43,13 +45,13 @@ require('yargs')
     },
     function(argv) {
       use({
-        inDir: argv.dir,
+        workspace: argv.dir,
         packages: argv._.slice(1),
         fetch: argv.fetch
       });
     }
   )
-  .option('dir', { alias: 'd', describe: 'Directory with all the packages' })
-  .default('dir', function() { return process.cwd(); }, '`cwd`')
+  .option('workspace', { alias: 'w', describe: 'The directory with all the packages' })
+  .default('workspace', function() { return process.cwd(); }, '`cwd`')
   .help()
   .argv;

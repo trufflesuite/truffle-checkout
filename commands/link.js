@@ -8,7 +8,7 @@ var eachPackage = require("../lib/eachPackage")
 
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
-  var inDir = options.inDir;
+  var workspace = options.workspace;
 
   var thisCwd = process.cwd();
 
@@ -17,7 +17,7 @@ module.exports = function(options, logger) {
   // Build up a cache
   var packages = [];
   var packagePaths = {};
-  eachPackage(inDir, function(packageName, srcPath) {
+  eachPackage(workspace, function(packageName, srcPath) {
     packages.push(packageName);
     packagePaths[packageName] = srcPath;
   }, { without: ['truffle'] })

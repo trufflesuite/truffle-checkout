@@ -6,13 +6,13 @@ var indent = require("../lib/indent");
 
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
-  var inDir = options.inDir;
+  var workspace = options.workspace;
 
   logger.log();
   logger.log("Status:");
   logger.log();
 
-  var statuses = status(inDir);
+  var statuses = status(workspace);
   var packageNames = statuses.map(function(item) {
     return item.package;
   });
