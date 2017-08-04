@@ -9,7 +9,7 @@ var fetch = require("../lib/fetch");
 var checkout = require("../lib/checkout");
 var pull = require("../lib/pull");
 
-var eachPackage = require("../lib/eachPackage");
+var packages = require("../lib/packages");
 
 /**
  * [switch] For each package, swaps to the specified org/branch combo
@@ -28,7 +28,7 @@ module.exports = function(options, logger) {
   logger.log("If you have unstaged changes, this command will fail in the appropriate directory.");
   logger.log();
 
-  eachPackage(workspace, function(packageName, srcPath) {
+  packages.forEachIn(workspace, function(packageName, srcPath) {
     // for each package, add the specified remote if not exists
     if (!remotes.has(srcPath, orgName)) {
       remotes.add(srcPath, orgName);
