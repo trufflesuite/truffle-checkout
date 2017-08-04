@@ -3,6 +3,7 @@ var link = require("./commands/link");
 var list = require("./commands/list");
 var use = require("./commands/use");
 var switchCmd = require("./commands/switch");
+var test = require("./commands/test");
 var process = require("process");
 
 require('yargs')
@@ -38,6 +39,15 @@ require('yargs')
         workspace: argv.dir,
         packages: argv._.slice(1),
         fetch: argv.fetch
+      });
+    }
+  )
+  .command('test', "Run all tests in packages given a sub-graph specification",
+    function() {},
+    function(argv) {
+      test({
+        workspace: argv.dir,
+        packagesSpec: argv._.slice(1),
       });
     }
   )
