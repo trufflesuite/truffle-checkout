@@ -5,6 +5,7 @@ var link = require("./commands/link");
 var list = require("./commands/list");
 var use = require("./commands/use");
 var workon = require("./commands/workon");
+var test = require("./commands/test");
 
 require('yargs')
   .command('list', 'List managed packages',
@@ -34,6 +35,15 @@ require('yargs')
         branchName: argv.branch
       });
   })
+  .command('test', "Run all tests in packages given a sub-graph specification",
+    function() {},
+    function(argv) {
+      test({
+        workspace: argv.dir,
+        packagesSpec: argv._.slice(1),
+      });
+    }
+  )
   .command('*', 'Initialize and use a specific set of truffle modules',
     function(yargs) {
       return yargs
