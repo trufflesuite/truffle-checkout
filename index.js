@@ -15,7 +15,7 @@ require('yargs')
   .command('link', 'Link managed packages',
     function() {},
     function(argv) {
-      lint({ workspace: argv.dir });
+      link({ workspace: argv.dir });
       process.exit();
   })
   .command('init', 'Initialize truffle, pointing to trufflesuite/master',
