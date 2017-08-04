@@ -14,10 +14,10 @@ function parseFilters(args) {
     children = ["truffle"];
   } else if (args.length == 1) {
     parents = ["truffle"];
-    children = [packagesSpec[0]];
+    children = [args[0]];
   } else if (args.length == 2) {
-    parents = [packagesSpec[0]];
-    children = [packagesSpec[1]];
+    parents = [args[0]];
+    children = [args[1]];
   } else {
     var separatorIndex = args.indexOf("~~");
 
@@ -119,9 +119,13 @@ module.exports = function(options, logger) {
   pkgs.forEach(function(pkgName) {
     logger.log();
 
-    testPackage({
-      workspace: workspace,
-      directory: pkgName
-    }, logger);
+    try {
+      testPackage({
+        workspace: workspace,
+        directory: pkgName
+      }, logger);
+    } catch(error) {
+      logger.log("Tests failed.");
+    }
   });
 }
