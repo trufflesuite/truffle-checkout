@@ -101,6 +101,7 @@ module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
   var workspace = options.workspace;
   var filters = parseFilters(options.packagesSpec);
+  var strictChildren = options.strictChildren || false;
 
   var parents = filters.parents;
   var children = filters.children;
@@ -111,6 +112,13 @@ module.exports = function(options, logger) {
   );
 
   var pkgs = resolvePackagesToTest(workspace, filters.parents, filters.children);
+
+  if (strictChildren) {
+    pkgs = pkgs.filter(function(pkgName) {
+      var pkgInChildren = new Set(children).has(pkgName);
+      return !pkgInChildren;
+    });
+  }
 
   logger.log(
     pkgs.map(function(name) { return `  - ${name}`; }).join("\n")
