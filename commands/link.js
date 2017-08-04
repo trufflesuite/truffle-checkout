@@ -7,18 +7,18 @@ var runSync = require("../lib/runsync");
 
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
-  var inDir = options.inDir;
+  var workspace = options.workspace;
 
   logger.log("Linking packages...")
 
-  var packages = fs.readdirSync(inDir).filter(function(directory) {
+  var packages = fs.readdirSync(workspace).filter(function(directory) {
     return fs.statSync(directory).isDirectory();
   });
 
   var packagePaths = {};
 
   packages.forEach(function(packageName) {
-    packagePaths[packageName] = path.resolve(path.join(inDir, packageName));
+    packagePaths[packageName] = path.resolve(path.join(workspace, packageName));
   });
 
   packages.forEach(function(packageName) {

@@ -18,7 +18,7 @@ var eachPackage = require("../lib/eachPackage");
  */
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
-  var inDir = options.inDir;
+  var workspace = options.workspace;
   var orgName = options.orgName || constants.defaultOrganization;
   var remoteName = constants.remoteForOrg(orgName);
   var branchName = options.branchName || constants.defaultBranch;
@@ -28,7 +28,7 @@ module.exports = function(options, logger) {
   logger.log("If you have unstaged changes, this command will fail in the appropriate directory.");
   logger.log();
 
-  eachPackage(inDir, function(packageName, srcPath) {
+  eachPackage(workspace, function(packageName, srcPath) {
     // for each package, add the specified remote if not exists
     if (!remotes.has(srcPath, orgName)) {
       remotes.add(srcPath, orgName);

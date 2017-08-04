@@ -3,24 +3,25 @@ var link = require("./commands/link");
 var list = require("./commands/list");
 var use = require("./commands/use");
 var switchCmd = require("./commands/switch");
+var process = require("process");
 
 require('yargs')
   .command('list', 'List managed packages',
     function() {},
     function(argv) {
-      list({ inDir: argv.dir });
+      list({ workspace: argv.dir });
       process.exit();
   })
   .command('link', 'Link managed packages',
     function() {},
     function(argv) {
-      lint({ inDir: argv.dir });
+      lint({ workspace: argv.dir });
       process.exit();
   })
   .command('init', 'Initialize truffle, pointing to trufflesuite/master',
     function() {},
     function(argv) {
-      use({ inDir: argv.dir, packages: [] });
+      use({ workspace: argv.dir, packages: [] });
     }
   )
   .command('use', 'Initialize and use a specific set of truffle modules',
@@ -34,8 +35,8 @@ require('yargs')
     },
     function(argv) {
       use({
-        inDir: argv.dir,
-        packages: argv._,
+        workspace: argv.dir,
+        packages: argv._.slice(1),
         fetch: argv.fetch
       });
     }
@@ -44,7 +45,7 @@ require('yargs')
     function() {},
     function(argv) {
       switchCmd({
-        inDir: argv.dir,
+        workspace: argv.dir,
         orgName: argv.org,
         branchName: argv.branch
       });
