@@ -43,11 +43,15 @@ require('yargs')
     }
   )
   .command('test', "Run all tests in packages given a sub-graph specification",
-    function() {},
+    function(yargs) {
+      return yargs
+        .boolean('strict-children');
+    },
     function(argv) {
       test({
         workspace: argv.dir,
         packagesSpec: argv._.slice(1),
+        strictChildren: argv['strict-children']
       });
     }
   )
