@@ -13,7 +13,7 @@ function parseFilters(args) {
     parents = ["truffle"];
     children = ["truffle"];
   } else if (args.length == 1) {
-    parents = ["truffle"];
+    parents = [args[0]];
     children = [args[0]];
   } else if (args.length == 2) {
     parents = [args[0]];
