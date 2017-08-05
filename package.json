@@ -28,7 +28,6 @@
   "dependencies": {
     "github": "^9.2.0",
     "lodash": "^4.17.4",
-    "rimraf": "^2.6.1",
     "yargs": "^8.0.2"
   }
 }
