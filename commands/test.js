@@ -124,6 +124,7 @@ module.exports = function(options, logger) {
     pkgs.map(function(name) { return `  - ${name}`; }).join("\n")
   );
 
+  var failed = false;
   pkgs.forEach(function(pkgName) {
     logger.log();
 
@@ -134,6 +135,11 @@ module.exports = function(options, logger) {
       }, logger);
     } catch(error) {
       logger.log("Tests failed.");
+      failed = true;
     }
   });
+
+  if (failed) {
+    throw new Error("Some tests failed. Please check output");
+  }
 }
