@@ -11,26 +11,26 @@ require('yargs')
   .command('list', 'List managed packages',
     function() {},
     function(argv) {
-      list({ workspace: argv.dir });
+      list({ workspace: argv.workspace });
       process.exit();
   })
   .command('link', 'Link managed packages',
     function() {},
     function(argv) {
-      link({ workspace: argv.dir });
+      link({ workspace: argv.workspace });
       process.exit();
   })
   .command('init', 'Initialize truffle, pointing to trufflesuite/master',
     function() {},
     function(argv) {
-      use({ workspace: argv.dir, packages: [] });
+      use({ workspace: argv.workspace, packages: [] });
     }
   )
   .command('workon <org> <branch>', 'Use a specific remote/branch environment',
     function() {},
     function(argv) {
       workon({
-        inDir: argv.dir,
+        workspace: argv.workspace,
         orgName: argv.org,
         branchName: argv.branch
       });
@@ -42,7 +42,7 @@ require('yargs')
     },
     function(argv) {
       test({
-        workspace: argv.dir,
+        workspace: argv.workspace,
         packagesSpec: argv._.slice(1),
         strictChildren: argv['strict-children']
       });
@@ -59,7 +59,7 @@ require('yargs')
     },
     function(argv) {
       use({
-        workspace: argv.dir,
+        workspace: argv.workspace,
         packages: argv._.slice(1),
         fetch: argv.fetch
       });

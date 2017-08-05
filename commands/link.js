@@ -4,7 +4,7 @@ var path = require("path");
 var indent = require("../lib/indent");
 var runSync = require("../lib/runsync");
 
-var eachPackage = require("../lib/eachPackage")
+var packages = require("../lib/packages")
 
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
@@ -17,7 +17,7 @@ module.exports = function(options, logger) {
   // Build up a cache
   var packages = [];
   var packagePaths = {};
-  eachPackage(workspace, function(packageName, srcPath) {
+  packages.forEachIn(workspace, function(packageName, srcPath) {
     packages.push(packageName);
     packagePaths[packageName] = srcPath;
   }, { without: ['truffle'] })
