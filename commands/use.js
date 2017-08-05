@@ -98,15 +98,10 @@ module.exports = function(options, logger) {
       prepared[currentPackageName] = packageBranch;
     }
 
-    logger.log("Linking packages...");
-
     // Linking step happens after everything has been prepared
     link({ inDir: inDir }, indent(logger, 2));
 
-    logger.log();
-    logger.log("Status:");
-    logger.log();
-
+    // Display status
     list({ inDir: inDir }, indent(logger, 2));
     logger.log("")
   }).catch(function(e) {

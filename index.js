@@ -2,7 +2,7 @@
 var link = require("./commands/link");
 var list = require("./commands/list");
 var use = require("./commands/use");
-var switchCmd = require("./commands/switch");
+var workon = require("./commands/workon");
 
 require('yargs')
   .command('list', 'List managed packages',
@@ -14,7 +14,7 @@ require('yargs')
   .command('link', 'Link managed packages',
     function() {},
     function(argv) {
-      lint({ inDir: argv.dir });
+      link({ inDir: argv.dir });
       process.exit();
   })
   .command('init', 'Initialize truffle, pointing to trufflesuite/master',
@@ -23,7 +23,16 @@ require('yargs')
       use({ inDir: argv.dir, packages: [] });
     }
   )
-  .command('use', 'Initialize and use a specific set of truffle modules',
+  .command('workon <org> <branch>', 'Use a specific remote/branch environment',
+    function() {},
+    function(argv) {
+      workon({
+        inDir: argv.dir,
+        orgName: argv.org,
+        branchName: argv.branch
+      });
+  })
+  .command('*', 'Initialize and use a specific set of truffle modules',
     function(yargs) {
       return yargs
         .option('fetch', {
@@ -35,20 +44,11 @@ require('yargs')
     function(argv) {
       use({
         inDir: argv.dir,
-        packages: argv._,
+        packages: argv._.slice(1),
         fetch: argv.fetch
       });
     }
   )
-  .command('switch <org> <branch>', 'Use a specific remote/branch environment',
-    function() {},
-    function(argv) {
-      switchCmd({
-        inDir: argv.dir,
-        orgName: argv.org,
-        branchName: argv.branch
-      });
-  })
   .option('dir', { alias: 'd', describe: 'Directory with all the packages' })
   .default('dir', function() { return process.cwd(); }, '`cwd`')
   .help()

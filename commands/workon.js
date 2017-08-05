@@ -12,7 +12,7 @@ var pull = require("../lib/pull");
 var eachPackage = require("../lib/eachPackage");
 
 /**
- * [switch] For each package, swaps to the specified org/branch combo
+ * [workon] For each package, swaps to the specified org/branch combo
  *   if such a branch exists, otherwise switching to
  *   the default org and default branch
  */

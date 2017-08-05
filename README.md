@@ -10,12 +10,17 @@ $ npm install -g truffle-checkout
 
 ## Usage
 
+Note: make sure you've removed any globally installed truffle packages, or the `npm link` will fail.
+
 ```
 # Download, checkout, link, and `npm install` all of the truffle modules
 $ tc init
 
+# Install a specific version of a package with
+$ tc truffle:develop truffle-contract:my-branch
+
 # Checkout :org/:branch in all modules; useful for reviewing cross-cutting changes
-$ tc switch :org :branch
+$ tc workon :org :branch
 
 # List all modules and their status
 $ tc list

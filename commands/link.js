@@ -1,44 +1,52 @@
 var fs = require("fs");
 var path = require("path");
-var rimraf = require("rimraf");
 
 var indent = require("../lib/indent");
 var runSync = require("../lib/runsync");
+
+var eachPackage = require("../lib/eachPackage")
 
 module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
   var inDir = options.inDir;
 
-  logger.log("Linking packages...")
+  var thisCwd = process.cwd();
 
-  var packages = fs.readdirSync(inDir).filter(function(directory) {
-    return fs.statSync(directory).isDirectory();
-  });
+  logger.log("Linking packages...");
 
+  // Build up a cache
+  var packages = [];
   var packagePaths = {};
+  eachPackage(inDir, function(packageName, srcPath) {
+    packages.push(packageName);
+    packagePaths[packageName] = srcPath;
+  }, { without: ['truffle'] })
 
   packages.forEach(function(packageName) {
-    packagePaths[packageName] = path.resolve(path.join(inDir, packageName));
-  });
+    // run `npm link` in every package directory (except `truffle`) because it
+    //  clobbers the same `truffle` executable in truffle-core
+    runSync("npm", ["link"], packagePaths[packageName], indent(logger, 2));
+  })
 
   packages.forEach(function(packageName) {
-    var fullpath = packagePaths[packageName];
+    var srcPath = packagePaths[packageName];
 
-    packages.forEach(function(potential_dependency) {
-      var expected_dependency_base_path = path.join(fullpath, "node_modules");
-      var expected_dependency_installation_path = path.join(expected_dependency_base_path, potential_dependency);
-
+    packages.forEach(function(potentialDependencyPackageName) {
+      // @TODO - we should probably parse package.json to determine if we need
+      //  to link dependencies
+      var expected_dependency_base_path = path.join(srcPath, "node_modules");
+      var expected_dependency_installation_path = path.join(
+        expected_dependency_base_path,
+        potentialDependencyPackageName
+      );
       if (fs.existsSync(expected_dependency_installation_path) == false) {
         return;
       }
 
-      // So the dependency is installed. Remove it and replace it with the linked version.
-      rimraf.sync(expected_dependency_installation_path);
-
-      // Now link it back up.
-      runSync('ln', ["-s", packagePaths[potential_dependency], potential_dependency], expected_dependency_base_path, indent(logger, 2), true)
+      // So the dependency is installed. Use `npm link` to link it.
+      runSync("npm", ["link", potentialDependencyPackageName], packagePaths[packageName], indent(logger, 2));
     });
   });
 
-  logger.log("Done.")
+  logger.log("Done.");
 };

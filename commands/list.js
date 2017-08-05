@@ -8,6 +8,10 @@ module.exports = function(options, logger) {
   var logger = logger || indent(console, 0);
   var inDir = options.inDir;
 
+  logger.log();
+  logger.log("Status:");
+  logger.log();
+
   var statuses = status(inDir);
   var packageNames = statuses.map(function(item) {
     return item.package;
